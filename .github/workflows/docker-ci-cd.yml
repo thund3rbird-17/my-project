@@ -1,9 +1,10 @@
 name: Docker CI/CD Workflow
 
+# Trigger the workflow on code push to the main branch
 on:
-  push: 
+  push:
     branches:
-      - main          
+      - main
 
 jobs:
   build-and-push:
@@ -11,23 +12,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    # Step 1: Checkout the code
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+    # Step 2: Set up Docker Buildx
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.prajaktanaik17}}
-          password: ${{ secrets.Imcute@17}}
+    # Step 3: Log in to Docker Hub
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          tags: ${{ secrets.prajaktanaik17 }}/simple-website:latest
+    # Step 4: Build and push the Docker image
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        push: true
+        tags: ${{ secrets.USERNAME }}/simple-website:latest
 
   deploy:
     name: Deploy Docker Container
@@ -35,15 +40,17 @@ jobs:
     needs: build-and-push
 
     steps:
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.prajaktanaik17 }}
-          password: ${{ secrets.Imcute@17 }}
+    # Step 1: Log in to Docker Hub
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
 
-      - name: Deploy the Container
-        run: |
-          docker pull ${{ secrets.prajaktanaik17 }}/simple-website:latest
-          docker stop simple-website || true
-          docker rm simple-website || true
-          docker run -d --name simple-website -p 8080:80 ${{ secrets.prajaktanaik17 }}/simple-website:latest
+    # Step 2: Pull and run the Docker container
+    - name: Deploy the container
+      run: |
+        docker pull ${{ secrets.USERNAME }}/simple-website:latest
+        docker stop simple-website || true
+        docker rm simple-website || true
+        docker run -d --name simple-website -p 8080:80 ${{ secrets.USERNAME }}/simple-website:latest
