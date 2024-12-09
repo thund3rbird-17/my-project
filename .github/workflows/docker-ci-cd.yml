@@ -1,1 +1,59 @@
-name: Docker CICD
+name: Docker CI/CD Workflow
+
+on:
+  push: 
+     branches:
+             -main          
+jobs:
+build-and-push:
+name: build and push on docker image
+runs-on: ubuntu-latest
+
+steps:
+-name: checkout repository
+uses: action/checkout@v3
+
+-name: set up Docker Buildx
+uses: docker/setup-buildx-actions@v2
+
+-name: log in to Docker Hub
+uses: docker-logion-actions@v2
+with:
+username: ${{secrets.prajakta17}}
+password: ${{secrets.Imcute17}}
+
+-name: Build-and -push Docker image
+uses: docker build-push-actions@v5
+with:
+push: true
+tags: ${{secrets.prajakta17}}/simple-website:latest
+
+deploy:
+-name: Deploy Docker Container
+runs-on: ubuntu-latest
+
+-name: log in to Docker Hub
+uses: docker-logion-actions@v2
+with:
+username: ${{secrets.prajakta17}}
+password: ${{secrets.Imcute17}}
+
+-name: deploy the container
+runs:
+        docker pull ${{ secrets.prajakta17 }}/simple-website:latest
+        docker stop simple-website || true
+        docker rm simple-website || true
+        docker run -d --name simple-website -p 8080:80 ${{ secrets.prajkata17 }}/simple-website:latest
+
+
+
+
+
+
+
+
+
+  
+
+
+
